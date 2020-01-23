@@ -1,0 +1,88 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(magrittr)
+library(Biobase)
+```
+
+## Download the count matrix from GEO
+
+```{r,eval=FALSE}
+curl::curl_download('https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE100895&format=file&file=GSE100895%5FRNA%2DSeq%5Fcounting%5Ftable%2Ecsv%2Egz', './count.csv.gz')
+```
+
+
+## Read the count matrix
+
+```{r}
+raw.table = data.table::fread('count.csv') %>%
+    data.frame()
+counts = raw.table[, 10:ncol(raw.table)] %>%
+    dplyr::mutate_each(as.numeric) %>%
+    as.matrix()
+```
+
+## Create `ExpressionSet`
+
+### Assay data
+
+```{r}
+gene.assayData <- new.env()
+assign('exprs', counts, envir = gene.assayData) # exprs is required
+assign('count', counts, envir = gene.assayData)
+ExpressionSet(assayData = gene.assayData)
+```
+
+### Phenotypic data
+
+```{r}
+metadata = data.frame('UID' = c('WT_1', 'WT_2', "WT_3", "H3V_KO_1", "H3V_KO_2", "H3V_KO_3", "H4V_KO_1", "H4V_KO_2", "H4V_KO_3", "H3V_H4V_dKO_1", "H3V_H4V_dKO_2", "H3V_H4V_dKO_3"),
+                      'group' = c(rep('WT', 3), rep('H3V_KO',3), rep('H4V_KO', 3), rep('H3V_H4V_dKO',3)))
+libnames <- colnames(gene.assayData$exprs) %>% as.character()
+gene.phenoData <- data.frame('UID' = libnames) %>%
+    merge(y = metadata, by = 'UID', sort = FALSE, all.x = TRUE, all.y = FALSE)  %>%
+    set_rownames(libnames) %>%
+    Biobase::AnnotatedDataFrame(data = ., varMetadata = data.frame('labelDescription' = colnames(.), row.names = colnames(.)))
+```
+
+### Annotations and features
+
+```{r}
+featureData <- raw.table[,1:9]
+featureData$ID = stringr::str_match(featureData$Attributes, 'ID=(\\w+)\\W?.*$')[,2]
+featureData = featureData %>%
+    Biobase::AnnotatedDataFrame(data = ., varMetadata = data.frame('labelDescription' = colnames(.), row.names = colnames(.)))
+```
+
+### Experiment description
+
+```{r}
+experimentData <- new("MIAME",
+                      lab = "Förstner Lab",
+                      contact = "foerstner@zbmed.de",
+                      title = "RNAseq of wildtype and deletion mutants",
+                      abstract = "Total RNA from 45 million cells was extracted in triplicates, spiked with a synthetic RNA control. RNA was depleted for rRNA using custom-made anti-rRNA oligonucleotides that hybridize to the target RNAs and are subsequently digested with RNAseH. RNA was reverse transcribed into cDNA and libraries for Illumina sequencing were constructed. We aimed at 15 million reads for each replicate.",
+                      other = list(
+                          citation = "Müller LSM, Cosentino RO, Förstner KU, Guizetti J et al. Genome organization and DNA accessibility control antigenic variation in trypanosomes. Nature 2018 Nov;563(7729):121-125. PMID: 30333624"
+                      )
+                      )
+```
+
+### Assembling an `ExpressionSet`
+
+```{r}
+tbru.rnaseq <- ExpressionSet(assayData = gene.assayData,
+                             phenoData = gene.phenoData,
+                             experimentData = experimentData,
+                             featureData = featureData
+                             )
+```
+
+## Writing data set
+
+```{r}
+usethis::use_data(tbru.rnaseq)
+```

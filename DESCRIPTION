@@ -1,0 +1,9 @@
+Package: data-rnaseq-Tbru
+Title: RNA-seq data of Tripanosoma brucei from Müller et al. (PMID: 30333624) 
+Version: 0.0.0.9000
+Authors@R: person("Trang", "Tran", email = "ttdtrang@gmail.com", role = c("aut", "cre"))
+Description: RNAseq of wildtype and deletion mutants (H3.V KO, H4.V KO, H3.V/H4.V KO) 
+Depends: R (>= 3.5.3)
+License: CC-BY 
+Encoding: UTF-8
+LazyData: true
