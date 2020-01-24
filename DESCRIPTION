@@ -1,4 +1,4 @@
-Package: data-rnaseq-Tbru
+Package: data.rnaseq.Tbru
 Title: RNA-seq data of Tripanosoma brucei from Müller et al. (PMID: 30333624) 
 Version: 0.0.0.9000
 Authors@R: person("Trang", "Tran", email = "ttdtrang@gmail.com", role = c("aut", "cre"))
