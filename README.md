@@ -8,15 +8,10 @@
   
 ## Usage
 
-### Option 1: Download the data file
-
-```sh
-wget https://github.com/ttdtrang/data-rnaseq-Tbru/blob/master/data/tbru.rnaseq.rda
-```
-
-### Option 2 [Tentative]: Install the package
-
+Install, import and load the data set
 ```R
 devtools::install_github('ttdtrang/data-rnaseq-Tbru')
 library(data-rnaseq-Tbru)
+data(tbru.rnaseq)
+dim(tbru.rnaseq@assayData$exprs)
 ```
