@@ -1,4 +1,4 @@
-# Data package of Tripanosoma brunei RNA-seq
+# Data package of _Tripanosoma brunei_ RNA-seq
 
 ## Sources
 
@@ -11,7 +11,7 @@
 Install, import and load the data set
 ```R
 devtools::install_github('ttdtrang/data-rnaseq-Tbru')
-library(data-rnaseq-Tbru)
+library(data.rnaseq.Tbru)
 data(tbru.rnaseq)
 dim(tbru.rnaseq@assayData$exprs)
 ```
